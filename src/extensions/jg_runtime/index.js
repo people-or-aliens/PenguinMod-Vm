@@ -74,7 +74,7 @@ class JgRuntimeBlocks {
                     arguments: {
                         URL: {
                             type: ArgumentType.STRING,
-                            defaultValue: 'https://api.allorigins.win/raw?url=https://penguinmod.site/static/assets/9525874be2b1d66bd448bf53400011a9.svg'
+                            defaultValue: 'https://api.allorigins.win/raw?url=https://studio.penguinmod.site/static/assets/9525874be2b1d66bd448bf53400011a9.svg'
                         },
                         name: {
                             type: ArgumentType.STRING,
@@ -605,7 +605,7 @@ class JgRuntimeBlocks {
     deleteSprite(args) {
         const target = this.runtime.getSpriteTargetByName(args.NAME);
         if (!target) return;
-        vm.deleteSprite(target.id);
+        vm.deleteSpriteInternal(target.id);
     }
 
     getDataOption(args, util) {

@@ -44,7 +44,7 @@ const ArgumentType = {
     IMAGE: 'image',
 
     /**
-     * creates an input with n x,y inputs
+     * pm: creates an input with n x,y inputs
      */
     POLYGON: 'polygon',
 

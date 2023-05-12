@@ -1225,7 +1225,7 @@ class JSGenerator {
             const value = this.localVariables.next();
             this.source += `const ${value} = ${this.descendInput(node.input).asUnknown()};`;
             // blocks like legacy no-ops can return a literal `undefined`
-            this.source += `debugger;\nif (${value} !== undefined) runtime.visualReport("${sanitize(this.script.topBlockId)}", ${value});\n`;
+            this.source += `if (${value} !== undefined) runtime.visualReport("${sanitize(this.script.topBlockId)}", ${value});\n`;
             break;
         }        
         case 'sensing.set.of': {

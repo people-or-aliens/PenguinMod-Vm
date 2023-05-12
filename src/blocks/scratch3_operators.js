@@ -15,6 +15,7 @@ class Scratch3OperatorsBlocks {
      * Retrieve the block primitives implemented by this package.
      * @return {object.<string, Function>} Mapping of opcode to Function.
      */
+    //
     getPrimitives () {
         return {
             operator_add: this.add,
@@ -28,6 +29,10 @@ class Scratch3OperatorsBlocks {
             operator_ltorequal: this.ltorequal,
             operator_gtorequal: this.gtorequal,
             operator_and: this.and,
+            operator_nand: this.nand,
+            operator_nor: this.nor,
+            operator_xor: this.xor,
+            operator_xnor: this.xnor,
             operator_or: this.or,
             operator_not: this.not,
             operator_random: this.random,
@@ -62,8 +67,22 @@ class Scratch3OperatorsBlocks {
             operator_code_to_character: this.codeToChar,
             operator_textStartsOrEndsWith: this.textStartsOrEndsWith,
             operator_countAppearTimes: this.countAppearTimes,
-            operator_textIncludesLetterFrom: this.textIncludesLetterFrom
+            operator_textIncludesLetterFrom: this.textIncludesLetterFrom,
+            operator_javascript_output: this.javascriptOutput,
+            operator_javascript_boolean: this.javascriptBoolean
         };
+    }
+    
+    
+    // eslint-disable-next-line no-unused-vars
+    javascriptOutput (args, util, realBlockInfo) {
+        const js = Cast.toString(args.JS);
+        return eval(js);
+    }
+    // eslint-disable-next-line no-unused-vars
+    javascriptBoolean (args, util, realBlockInfo) {
+        const js = Cast.toString(args.JS);
+        return eval(js) === true;
     }
 
     charToCode (args) {
@@ -246,6 +265,24 @@ class Scratch3OperatorsBlocks {
 
     and (args) {
         return Cast.toBoolean(args.OPERAND1) && Cast.toBoolean(args.OPERAND2);
+    }
+    
+    nand (args) {
+        return !(Cast.toBoolean(args.OPERAND1) && Cast.toBoolean(args.OPERAND2));
+    }
+
+    nor (args) {
+        return !(Cast.toBoolean(args.OPERAND1) || Cast.toBoolean(args.OPERAND2));
+    }
+
+    xor (args) {
+        const op1 = Cast.toBoolean(args.OPERAND1);
+        const op2 = Cast.toBoolean(args.OPERAND2);
+        return (op1 ? !op2 : op2);
+    }
+
+    xnor (args) {
+        return !this.xor(args);
     }
 
     or (args) {

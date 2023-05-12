@@ -57,6 +57,7 @@ class Scratch3EventBlocks {
     getPrimitives () {
         return {
             event_whenanything: this.whenanything,
+            event_whenjavascript: this.whenjavascript,
             event_whentouchingobject: this.touchingObject,
             event_broadcast: this.broadcast,
             event_broadcastandwait: this.broadcastAndWait,
@@ -66,6 +67,12 @@ class Scratch3EventBlocks {
 
     whenanything (args) {
         return Boolean(args.ANYTHING || false);
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    whenjavascript (args, util, realBlockInfo) {
+        const js = Cast.toString(args.JS);
+        return eval(js) === true;
     }
 
     getHats () {
@@ -90,6 +97,10 @@ class Scratch3EventBlocks {
                 restartExistingThreads: false
             },
             event_whenanything: {
+                restartExistingThreads: false,
+                edgeActivated: true
+            },
+            event_whenjavascript: {
                 restartExistingThreads: false,
                 edgeActivated: true
             },

@@ -46,7 +46,8 @@ class Scratch3ControlBlocks {
             control_clear_counter: this.clearCounter,
             control_all_at_once: this.allAtOnce,
             control_backToGreenFlag: this.backToGreenFlag,
-            control_if_return_else_return: this.if_return_else_return
+            control_if_return_else_return: this.if_return_else_return,
+            control_javascript_command: this.runJavascript
         };
     }
 
@@ -72,6 +73,12 @@ class Scratch3ControlBlocks {
                 restartExistingThreads: false
             }
         };
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    runJavascript (args, util, realBlockInfo) {
+        const js = Cast.toString(args.JS);
+        return eval(js);
     }
 
     repeat (args, util) {

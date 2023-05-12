@@ -41,6 +41,11 @@ const LayerParam = {
     BACK: 'back'
 };
 
+const ItalicsParam = {
+    ON: 'on',
+    OFF: 'off'
+};
+
 /**
  * Enum for layer parameter values.
  * @readonly
@@ -91,8 +96,7 @@ class Scratch3PenBlocks {
          * @type {object}
          */
         this.printTextAttribute = {
-            bold: false,
-            underline: false,
+            weight: '400',
             italic: false,
             size: '28',
             font: 'Arial',
@@ -318,6 +322,27 @@ class Scratch3PenBlocks {
             }
         ];
     }
+    
+    getItalicsToggleParam () {
+        return [
+            {
+                text: formatMessage({
+                    id: 'pen.italicsToggle.on',
+                    default: 'on',
+                    description: 'label for on'
+                }),
+                value: ItalicsParam.ON
+            },
+            {
+                text: formatMessage({
+                    id: 'pen.italicsToggle.off',
+                    default: 'off',
+                    description: 'label for off'
+                }),
+                value: ItalicsParam.OFF
+            }
+        ];
+    }
 
     /**
      * Clamp a pen color parameter to the range (0,100).
@@ -426,6 +451,37 @@ class Scratch3PenBlocks {
                     arguments: {
                         COLOR: {
                             type: ArgumentType.COLOR
+                        }
+                    }
+                },
+                {
+                    opcode: 'setPrintFontWeight',
+                    blockType: BlockType.COMMAND,
+                    text: formatMessage({
+                        id: 'pen.setPrintFontWeight',
+                        default: 'set print font weight to [WEIGHT]',
+                        description: 'set print font weight'
+                    }),
+                    arguments: {
+                        WEIGHT: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 700
+                        }
+                    }
+                },
+                {
+                    opcode: 'setPrintFontItalics',
+                    blockType: BlockType.COMMAND,
+                    text: formatMessage({
+                        id: 'pen.setPrintFontItalics',
+                        default: 'turn print font italics [OPTION]',
+                        description: 'toggle print font italics'
+                    }),
+                    arguments: {
+                        OPTION: {
+                            type: ArgumentType.STRING,
+                            menu: 'italicsToggleParam',
+                            defaultValue: ItalicsParam.ON
                         }
                     }
                 },
@@ -827,7 +883,11 @@ class Scratch3PenBlocks {
                 layerParam: {
                     acceptReporters: false,
                     items: this.getLayerParam()
-                }
+                },
+                italicsToggleParam: {
+                    acceptReporters: false,
+                    items: this.getItalicsToggleParam()
+                },
             }
         };
     }
@@ -854,11 +914,18 @@ class Scratch3PenBlocks {
         const hex = Color.rgbToHex(rgb);
         this.printTextAttribute.color = hex;
     }
-
+    setPrintFontWeight (args) {
+        this.printTextAttribute.weight = args.WEIGHT;
+    }
+    setPrintFontItalics (args) {
+        this.printTextAttribute.italic = args.OPTION == ItalicsParam.ON ? true : false
+    }
     printText (args) {
         const ctx = this._getBitmapCanvas();
 
         let resultFont = '';
+        resultFont += `${this.printTextAttribute.italic ? 'italic ' : ''}`
+        resultFont += `${this.printTextAttribute.weight} `
         resultFont += `${this.printTextAttribute.size * this._penRes}px `;
         resultFont += this.printTextAttribute.font;
         ctx.font = resultFont;

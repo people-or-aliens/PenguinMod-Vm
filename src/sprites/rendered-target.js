@@ -237,11 +237,27 @@ class RenderedTarget extends Target {
     }
 
     /**
+     * pm: Rotation style for "look at"/flipping & spinning.
+     * @type {string}
+     */
+    static get ROTATION_STYLE_LOOK_AT () {
+        return 'look at';
+    }
+
+    /**
      * Rotation style for "left-right"/flipping.
      * @type {string}
      */
     static get ROTATION_STYLE_LEFT_RIGHT () {
         return 'left-right';
+    }
+
+    /**
+     * pm: Rotation style for "up-down"/flipping.
+     * @type {string}
+     */
+    static get ROTATION_STYLE_UP_DOWN () {
+        return 'up-down';
     }
 
     /**
@@ -305,9 +321,20 @@ class RenderedTarget extends Target {
 
     setTransform (transform) {
         if (!Array.isArray(transform) || transform.length !== 2) 
-            throw new TypeError('expected an array of length 2 for the transform input');
-        
+            throw new TypeError('Expected an Array of length 2 for the transform input');
+        if (this.isStage) {
+            return;
+        }
         this.transform = [transform[0], transform[1]];
+        if (this.renderer) {
+            const {direction: renderedDirection, scale} = this._getRenderedDirectionAndScale();
+            this.renderer.updateDrawableDirectionScale(this.drawableID, renderedDirection, scale, this.transform);
+            if (this.visible) {
+                this.emitVisualChange();
+                this.runtime.requestRedraw();
+            }
+        }
+        this.runtime.requestTargetsUpdate(this);
     }
 
     /**
@@ -326,6 +353,15 @@ class RenderedTarget extends Target {
             finalDirection = 90;
             const scaleFlip = (this.direction < 0) ? -1 : 1;
             finalScale = [scaleFlip * this.size, this.size];
+        } else if (this.rotationStyle === RenderedTarget.ROTATION_STYLE_UP_DOWN) {
+            // pm: Force rendered direction to be 90, and flip drawable if needed.
+            finalDirection = 90;
+            const scaleFlip = ((this.direction > 90) || (this.direction < -90)) ? -1 : 1;
+            finalScale = [this.size, scaleFlip * this.size];
+        } else if (this.rotationStyle === RenderedTarget.ROTATION_STYLE_LOOK_AT) {
+            // pm: Flip drawable if we are looking left.
+            const scaleFlip = (this.direction < 0) ? -1 : 1;
+            finalScale = [this.size, scaleFlip * this.size];
         }
         finalScale[0] *= this.stretch[0] / 100;
         finalScale[1] *= this.stretch[1] / 100;
@@ -631,6 +667,10 @@ class RenderedTarget extends Target {
             this.rotationStyle = RenderedTarget.ROTATION_STYLE_ALL_AROUND;
         } else if (rotationStyle === RenderedTarget.ROTATION_STYLE_LEFT_RIGHT) {
             this.rotationStyle = RenderedTarget.ROTATION_STYLE_LEFT_RIGHT;
+        } else if (rotationStyle === RenderedTarget.ROTATION_STYLE_UP_DOWN) {
+            this.rotationStyle = RenderedTarget.ROTATION_STYLE_UP_DOWN;
+        } else if (rotationStyle === RenderedTarget.ROTATION_STYLE_LOOK_AT) {
+            this.rotationStyle = RenderedTarget.ROTATION_STYLE_LOOK_AT;
         }
         if (this.renderer) {
             const {direction, scale} = this._getRenderedDirectionAndScale();
@@ -857,6 +897,26 @@ class RenderedTarget extends Target {
         const drawableCandidates = firstClone.sprite.clones.filter(clone => !clone.dragging)
             .map(clone => clone.drawableID);
         return this.renderer.isTouchingDrawables(
+            this.drawableID, drawableCandidates);
+    }
+
+    /**
+     * Return whether touching any of a named sprite's clones.
+     * @param {string} spriteName Name of the sprite.
+     * @return {boolean} True iff touching a clone of the sprite.
+     */
+    spriteTouchingPoint (spriteName) {
+        spriteName = Cast.toString(spriteName);
+        const firstClone = this.runtime.getSpriteTargetByName(spriteName);
+        if (!firstClone || !this.renderer) {
+            return null;
+        }
+        // Filter out dragging targets. This means a sprite that is being dragged
+        // can detect other sprites using touching <sprite>, but cannot be detected
+        // by other sprites while it is being dragged. This matches Scratch 2.0 behavior.
+        const drawableCandidates = firstClone.sprite.clones.filter(clone => !clone.dragging)
+            .map(clone => clone.drawableID);
+        return this.renderer.getTouchingDrawablesPoint(
             this.drawableID, drawableCandidates);
     }
 

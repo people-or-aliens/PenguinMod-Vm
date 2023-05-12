@@ -54,7 +54,32 @@ const statementBlocks = [
     'control_stop_sprite',
     'looks_changeVisibilityOfSprite',
     'looks_previouscostume',
-    'looks_previousbackdrop'
+    'looks_previousbackdrop',
+    'motion_pointinrandomdirection',
+    'motion_move_sprite_to_scene_side',
+    'sound_playallsounds',
+    'looks_stoptalking',
+    'sensing_setclipboard',
+    'motion_movebacksteps',
+    'motion_moveupdownsteps',
+    'motion_turnrightaroundxy',
+    'motion_turnleftaroundxy',
+    'motion_turnaround',
+    'motion_pointinrandomdirection',
+    'motion_pointtowardsxy',
+    'motion_glidedirectionstepsinseconds',
+    'motion_changebyxy',
+    'motion_ifonspritebounce',
+    'motion_ifonxybounce',
+    'motion_move_sprite_to_scene_side',
+    'control_javascript_command',
+    'looks_changeVisibilityOfSpriteShow',
+    'looks_changeVisibilityOfSpriteHide',
+    'sound_pause',
+    'sound_set_stop_fadeout_to',
+    'sound_play_at_seconds',
+    'sound_play_at_seconds_until_done',
+    'sound_pauseallsounds'
 ];
 
 const outputBlocks = [
@@ -124,7 +149,22 @@ const outputBlocks = [
     'sensing_fingerdown',
     'sensing_fingertapped',
     'sensing_fingerx',
-    'sensing_fingery'
+    'sensing_fingery',
+    'sensing_getclipboard',
+    'sensing_getdragmode',
+    'sensing_getoperatingsystem',
+    'sensing_getbrowser',
+    'sensing_geturl',
+    'operator_javascript_output',
+    'operator_javascript_boolean',
+    'sensing_getxyoftouchingsprite',
+    'operator_nand',
+    'operator_nor',
+    'operator_xor',
+    'operator_xnor',
+    'looks_getinputofcostume',
+    'sound_getTimePosition',
+    'sound_getSoundVolume'
 ];
 
 module.exports = {

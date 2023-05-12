@@ -91,8 +91,80 @@ class Scratch3SensingBlocks {
             sensing_fingerdown: this.fingerDown,
             sensing_fingertapped: this.fingerTapped,
             sensing_fingerx: this.getFingerX,
-            sensing_fingery: this.getFingerY
+            sensing_fingery: this.getFingerY,
+            sensing_setclipboard: this.setClipboard,
+            sensing_getclipboard: this.getClipboard,
+            sensing_getdragmode: this.getDragMode,
+            sensing_getoperatingsystem: this.getOS,
+            sensing_getbrowser: this.getBrowser,
+            sensing_geturl: this.getUrl,
+            sensing_getxyoftouchingsprite: this.getXYOfTouchingSprite
         };
+    }
+
+    getOS () {
+        if (!('userAgent' in navigator)) return 'Unknown';
+        const agent = navigator.userAgent;
+        if (agent.includes('Mac OS')) {
+            return 'MacOS';
+        }
+        if (agent.includes('CrOS')) {
+            return 'ChromeOS';
+        }
+        if (agent.includes('Linux')) {
+            return 'Linux';
+        }
+        if (agent.includes('Windows')) {
+            return 'Windows';
+        }
+        if (agent.includes('iPad') || agent.includes('iPod') || agent.includes('iPhone')) {
+            return 'iOS';
+        }
+        if (agent.includes('Android')) {
+            return 'Android';
+        }
+        return 'Unknown';
+    }
+    getBrowser () {
+        if (!('userAgent' in navigator)) return 'Unknown';
+        const agent = navigator.userAgent;
+        if (agent.includes('Chrome')) {
+            return 'Chrome';
+        }
+        if (agent.includes('MSIE') || agent.includes('rv:')) {
+            return 'Internet Explorer';
+        }
+        if (agent.includes('Firefox')) {
+            return 'Firefox';
+        }
+        if (agent.includes('Safari')) {
+            return 'Safari';
+        }
+        return 'Unknown';
+    }
+    getUrl () {
+        if (!('href' in location)) return '';
+        return location.href;
+    }
+
+    setClipboard (args) {
+        const text = Cast.toString(args.ITEM);
+        if (!navigator) return;
+        if (('clipboard' in navigator) && ('writeText' in navigator.clipboard)) {
+            navigator.clipboard.writeText(text);
+        }
+    }
+    getClipboard () {
+        if (!navigator) return '';
+        if (('clipboard' in navigator) && ('readText' in navigator.clipboard)) {
+            return navigator.clipboard.readText();
+        } else {
+            return '';
+        }
+    }
+
+    getDragMode (_, util) {
+        return util.target.draggable;
     }
 
     mouseClicked (_, util) {
@@ -312,6 +384,22 @@ class Scratch3SensingBlocks {
 
     touchingObject (args, util) {
         return util.target.isTouchingObject(args.TOUCHINGOBJECTMENU);
+    }
+
+    getXYOfTouchingSprite (args, util) {
+        const object = args.SPRITE;
+        if (object === '_mouse_') {
+            // we can just return mouse pos
+            // if mouse is touching us, the mouse size is practically 1x1 anyways
+            const x = util.ioQuery('mouse', 'getScratchX');
+            const y = util.ioQuery('mouse', 'getScratchY');
+            if (args.XY === 'y') return y;
+            return x;
+        }
+        const point = util.target.spriteTouchingPoint(object);
+        if (!point) return '';
+        if (args.XY === 'y') return point[1];
+        return point[0];
     }
 
     touchingColor (args, util) {

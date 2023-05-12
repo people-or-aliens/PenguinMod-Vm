@@ -750,6 +750,10 @@ const parseScratchObject = function (object, runtime, extensions, topLevel, zip,
             target.rotationStyle = RenderedTarget.ROTATION_STYLE_NONE;
         } else if (object.rotationStyle === 'leftRight') {
             target.rotationStyle = RenderedTarget.ROTATION_STYLE_LEFT_RIGHT;
+        } else if (object.rotationStyle === 'upDown') {
+            target.rotationStyle = RenderedTarget.ROTATION_STYLE_UP_DOWN;
+        } else if (object.rotationStyle === 'lookAt') {
+            target.rotationStyle = RenderedTarget.ROTATION_STYLE_LOOK_AT;
         } else if (object.rotationStyle === 'normal') {
             target.rotationStyle = RenderedTarget.ROTATION_STYLE_ALL_AROUND;
         }

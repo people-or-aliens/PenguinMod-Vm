@@ -7,7 +7,10 @@ const SecurityManager = require('./tw-security-manager');
 
 const AddonSwitches = require('./extension-addon-switchers');
 
+const urlParams = new URLSearchParams(location.search);
+
 const IsLocal = String(window.location.href).startsWith(`http://localhost:`);
+const IsLiveTests = urlParams.has('livetests');
 
 // These extensions are currently built into the VM repository but should not be loaded at startup.
 // TODO: move these out into a separate repository?
@@ -63,11 +66,16 @@ const builtinExtensions = {
     jgTween: () => require("../extensions/jg_tween"),
     // jg3d: holy sh
     jg3d: () => require("../extensions/jg_3d"),
+    // jgInterfaces: easier UI
+    jgInterfaces: () => require("../extensions/jg_interfaces"),
 
     // jgStorage: event extension requested by Fir & silvxrcat
     jgStorage: () => require("../extensions/jg_storage"),
     // jgTimers: event extension requested by Arrow
     jgTimers: () => require("../extensions/jg_timers"),
+    // jgAdvancedText: event extension requested by silvxrcat
+    // hiding so fir doesnt touch
+    // jgAdvancedText: () => require("../extensions/jg_advancedText"),
 
     // jgDev: test extension used for making core blocks
     jgDev: () => require("../extensions/jg_dev"),
@@ -126,12 +134,9 @@ const builtinExtensions = {
 
 const coreExtensionList = Object.getOwnPropertyNames(builtinExtensions);
 
-const preload = [
-    "colors",
-    "jwProto"
-];
+const preload = [];
 
-if (IsLocal) {
+if (IsLocal || IsLiveTests) {
     preload.push("jgDev");
 }
 

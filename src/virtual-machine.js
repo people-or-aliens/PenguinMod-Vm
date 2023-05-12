@@ -28,7 +28,7 @@ const {exportCostume} = require('./serialization/tw-costume-import-export');
 const Base64Util = require('./util/base64-util');
 
 const RESERVED_NAMES = ['_mouse_', '_stage_', '_edge_', '_myself_', '_random_'];
-const PM_LIBRARY_API = "https://pmobjectlibrary.jeremygamer13.repl.co/";
+const PM_LIBRARY_API = "https://penguinmod-objectlibraries.vercel.app/";
 
 const CORE_EXTENSIONS = [
     // 'motion',
@@ -923,7 +923,7 @@ class VirtualMachine extends EventEmitter {
         if (target) {
             if (soundObject.fromPenguinModLibrary === true) {
                 return new Promise((resolve, reject) => {
-                    fetch(`${PM_LIBRARY_API}?file=${soundObject.libraryId}`)
+                    fetch(`${PM_LIBRARY_API}files/${soundObject.libraryId}`)
                         .then((r) => r.arrayBuffer())
                         .then((arrayBuffer) => {
                             const storage = this.runtime.storage;
@@ -1280,6 +1280,51 @@ class VirtualMachine extends EventEmitter {
                 if (clone === currentEditingTarget) {
                     const nextTargetIndex = Math.min(this.runtime.targets.length - 1, targetIndexBeforeDelete);
                     if (this.runtime.targets.length > 0){
+                        this.setEditingTarget(this.runtime.targets[nextTargetIndex].id);
+                    } else {
+                        this.editingTarget = null;
+                    }
+                }
+            }
+            // Sprite object should be deleted by GC.
+            this.emitTargetsUpdate();
+            return restoreSprite;
+        }
+
+        throw new Error('No target with the provided id.');
+    }
+
+    /**
+     * pm: Clone of deleteSprite, used if an addon or script replaces the original deleteSprite.
+     * @param {string} targetId ID of a target whose sprite to delete.
+     * @return {Function} Returns a function to restore the sprite that was deleted
+     */
+    deleteSpriteInternal(targetId) {
+        const target = this.runtime.getTargetById(targetId);
+
+        if (target) {
+            const targetIndexBeforeDelete = this.runtime.targets.map(t => t.id).indexOf(target.id);
+            if (!target.isSprite()) {
+                throw new Error('Cannot delete non-sprite targets.');
+            }
+            const sprite = target.sprite;
+            if (!sprite) {
+                throw new Error('No sprite associated with this target.');
+            }
+            const spritePromise = this.exportSprite(targetId, 'uint8array');
+            const restoreSprite = () => spritePromise.then(spriteBuffer => this.addSprite(spriteBuffer));
+            // Remove monitors from the runtime state and remove the
+            // target-specific monitored blocks (e.g. local variables)
+            target.deleteMonitors();
+            const currentEditingTarget = this.editingTarget;
+            for (let i = 0; i < sprite.clones.length; i++) {
+                const clone = sprite.clones[i];
+                this.runtime.stopForTarget(sprite.clones[i]);
+                this.runtime.disposeTarget(sprite.clones[i]);
+                // Ensure editing target is switched if we are deleting it.
+                if (clone === currentEditingTarget) {
+                    const nextTargetIndex = Math.min(this.runtime.targets.length - 1, targetIndexBeforeDelete);
+                    if (this.runtime.targets.length > 0) {
                         this.setEditingTarget(this.runtime.targets[nextTargetIndex].id);
                     } else {
                         this.editingTarget = null;

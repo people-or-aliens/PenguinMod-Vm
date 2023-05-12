@@ -283,7 +283,7 @@ class canvas {
                         },
                         src: {
                             type: ArgumentType.STRING,
-                            defaultValue: 'https://penguinmod.site/favicon.ico'
+                            defaultValue: 'https://studio.penguinmod.site/favicon.ico'
                         }
                     },
                     blockType: BlockType.COMMAND

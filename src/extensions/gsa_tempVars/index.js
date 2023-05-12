@@ -27,7 +27,7 @@ class tempVars {
     getInfo () {
         return {
             id: 'tempVars',
-            name: 'temp variables',
+            name: 'Temporary Variables',
             color1: '#0069c2',
             color2: '#0060B4',
             color3: '#0060B4',
